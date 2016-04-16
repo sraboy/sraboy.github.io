@@ -1,0 +1,14 @@
+---
+layout: post
+title: Code Syntax Highlighting for HTML
+date: '2015-05-30T21:05:00.001-07:00'
+author: Steven Lavoie
+tags:
+- tutorial
+- coding
+modified_time: '2015-05-30T21:06:26.871-07:00'
+blogger_id: tag:blogger.com,1999:blog-1636451537745562628.post-5528914286818672877
+blogger_orig_url: http://imtryingtoscience.blogspot.com/2015/05/code-syntax-highlighting-for-html.html
+---
+
+I decided to remove the&nbsp;<a href="http://alexgorbatchev.com/SyntaxHighlighter/" target="_blank">syntax highlighting scripts</a>. They're great and it's nice to not do it manually but I don't own my own server. No other option works fast enough to not significantly delay the page loads on Blogger. I'm looking into getting my own server again.<br /><br />In the meantime, here's an easy enough process:<br /><ol><li>Copy/paste code into: http://tohtml.com/</li><li>Change background color to black.</li><li>Choose a language. I used IDL for GDB and bash for metasploit. Everything else is easy.</li><li>Click Highlight</li><li>Remove this on the first line: &lt;html&gt;&lt;body style='color:#d1d1d1; background:#000000; '&gt;&lt;pre&gt;. Seems to be a bug.</li><li>For bash (and probably others), change the purple color #40015a to #66347B. The former is too dark. I like W3's <a href="http://www.w3schools.com/tags/ref_colorpicker.asp" target="_blank">color picker</a>.</li></ol><div>For better or worse, doing it manually at least means no browser has to take the time to run a script and render it.</div>

