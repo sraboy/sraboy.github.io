@@ -23,9 +23,6 @@ permalink: /posts/:title/
 excerpt_separator: <!--more-->
 more: "read more"
 encoding: utf-8
-markdown: redcarpet
-redcarpet:
-    extensions: ['highlight','strikethrough', 'tables', 'with_toc_data', 'fenced_code_blocks', 'autolink', 'superscript']
 
 # GitHub Presets (cannot be changed for GitHub Pages)
 #lsi: false
