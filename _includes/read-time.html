@@ -1,0 +1,2 @@
+{% assign readtime = content | strip_html | number_of_words | divided_by:site.words_per_minute %}
+Grok time ~{% if readtime <= 1 %}1 minute{% elsif readtime >= 10 %}{{ readtime | times: 2}} minutes{% else %}{{ readtime }} minutes{% endif %}
