@@ -5,7 +5,7 @@ date: 2015-06-24 11:00:20
 author: Steven Lavoie
 tags:
 - tutorial
-- crackme
+- crackmes
 - reversing
 - project_bratalarm
 ---
@@ -78,7 +78,7 @@ To run our function, we'll need a code stub to call it:
 
 unsigned int subChangeQWORD(char *);
 
-int main(void) 
+int main(void)
 {
     printf("serialnum is %x\n", subChangeQWORD("serialnum"));
     return 0;
@@ -98,11 +98,11 @@ unsigned int subChangeQWORD(char * stringQWORD)
 }
 {% endhighlight %}
 
-Next, let's look for constants. The original programmer may have used constant values instead of variables but it will be easier for us to build this out if we start with variables. It's a bit more of a pain to write out in code but it makes it easier to align to the assembly if we get lost in the code or, like I often do, we take a day or two off of project. 
+Next, let's look for constants. The original programmer may have used constant values instead of variables but it will be easier for us to build this out if we start with variables. It's a bit more of a pain to write out in code but it makes it easier to align to the assembly if we get lost in the code or, like I often do, we take a day or two off of project.
 
 {% highlight c %}
 unsigned int subChangeQWORD(char * stringQWORD)
-{    
+{
     const int strlen = 8;       //[0x4012CD] mov ecx, 8
     const int dlSub = 48;       //[0x4012DB] sub dl, 0x30
     const int dlCmp = 10;       //[0x4012DE] cmp dl, 0x0A
@@ -121,7 +121,7 @@ Notice that I've commented out EDX. It actually took me some time in messing wit
 
 {% highlight c %}
 unsigned int subChangeQWORD(char * stringQWORD)
-{    
+{
     const int strlen = 8;       //[0x4012CD] mov ecx, 8
     const int dlSub = 48;       //[0x4012DB] sub dl, 0x30
     const int dlCmp = 10;       //[0x4012DE] cmp dl, 0x0A
@@ -148,7 +148,7 @@ Let's work on the encoding stuff now.
 
 {% highlight c %}
 unsigned int subChangeQWORD(char * stringQWORD)
-{    
+{
     const int strlen = 8;       //[0x4012CD] mov ecx, 8
     const int dlSub = 48;       //[0x4012DB] sub dl, 0x30
     const int dlCmp = 10;       //[0x4012DE] cmp dl, 0x0A
@@ -175,14 +175,14 @@ unsigned int subChangeQWORD(char * stringQWORD)
 
         dl -= dlCmpMaybe;        //[0x4012E3] sub dl, 0x7
         printf("dl - 7: %c\t", dl);
-        
-        printf("eax: 0x%08x\t\t", eax);        
-        
+
+        printf("eax: 0x%08x\t\t", eax);
+
         eax = eax << eaxSHL;     //[0x4012E6] shl eax, 0x4
         printf("eax << 4: 0x%08x\t", eax);
-        
+
         eax |= dl;               //[0x4012E9] or eax, edx
-        
+
         printf("eax |= dl: 0x%08x\n", eax);
         printf("---------------------------------------------------------------------------------------------------------------\n");
     }
@@ -191,7 +191,7 @@ unsigned int subChangeQWORD(char * stringQWORD)
 }
 {% endhighlight %}
 
-With the commenting, you should be able to follow the logic pretty easily. The **printf** statements are set up with formatting to make it all look good and line up on the commandline. 
+With the commenting, you should be able to follow the logic pretty easily. The **printf** statements are set up with formatting to make it all look good and line up on the commandline.
 
 Here's the entire code block:
 
@@ -200,14 +200,14 @@ Here's the entire code block:
 
 unsigned int subChangeQWORD(char *);
 
-int main(void) 
+int main(void)
 {
 	printf("serialnum is %x\n", subChangeQWORD("serialnum"));
 	return 0;
 }
 
 unsigned int subChangeQWORD(char * stringQWORD)
-{    
+{
     const int strlen = 8;       //[0x4012CD] mov ecx, 8
     const int dlSub = 48;       //[0x4012DB] sub dl, 0x30
     const int dlCmp = 10;       //[0x4012DE] cmp dl, 0x0A
@@ -234,14 +234,14 @@ unsigned int subChangeQWORD(char * stringQWORD)
 
         dl -= dlCmpMaybe;        //[0x4012E3] sub dl, 0x7
         printf("dl - 7: %c\t", dl);
-        
-        printf("eax: 0x%08x\t\t", eax);        
-        
+
+        printf("eax: 0x%08x\t\t", eax);
+
         eax = eax << eaxSHL;     //[0x4012E6] shl eax, 0x4
         printf("eax << 4: 0x%08x\t", eax);
-        
+
         eax |= dl;               //[0x4012E9] or eax, edx
-        
+
         printf("eax |= dl: 0x%08x\n", eax);
         printf("---------------------------------------------------------------------------------------------------------------\n");
     }
@@ -253,8 +253,8 @@ unsigned int subChangeQWORD(char * stringQWORD)
 Compare the output to the output you get while running this in OllyDbg. Just set a breakpoint at 0x4012EF and punch in the serial "serialnumbergoesherenowandstuffyay!" (or whatever) and compare. Your output should look like this:
 
 {% highlight objdump %}
-steve@debian:/media/sf_E_DRIVE/MalwareDisk/Crackmes/bratalarm$ gcc algorithm.c 
-steve@debian:/media/sf_E_DRIVE/MalwareDisk/Crackmes/bratalarm$ ./a.out 
+steve@debian:/media/sf_E_DRIVE/MalwareDisk/Crackmes/bratalarm$ gcc algorithm.c
+steve@debian:/media/sf_E_DRIVE/MalwareDisk/Crackmes/bratalarm$ ./a.out
 dl: s   dl - 48: C      dl - 7: <       eax: 0x00000000         eax << 4: 0x00000000    eax |= dl: 0x0000003c
 ---------------------------------------------------------------------------------------------------------------
 dl: e   dl - 48: 5      dl - 7: .       eax: 0x0000003c         eax << 4: 0x000003c0    eax |= dl: 0x000003ee
@@ -272,7 +272,7 @@ dl: n   dl - 48: >      dl - 7: 7       eax: 0x03efb2b5         eax << 4: 0x3efb
 dl: u   dl - 48: E      dl - 7: >       eax: 0x3efb2b77         eax << 4: 0xefb2b770    eax |= dl: 0xefb2b77e
 ---------------------------------------------------------------------------------------------------------------
 serialnum is efb2b77e
-steve@debian:/media/sf_E_DRIVE/MalwareDisk/Crackmes/bratalarm$ 
+steve@debian:/media/sf_E_DRIVE/MalwareDisk/Crackmes/bratalarm$
 {% endhighlight %}
 
 In the next part, we'll move on to figure out the rest of the encoding.

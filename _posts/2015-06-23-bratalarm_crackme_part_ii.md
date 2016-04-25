@@ -5,7 +5,7 @@ date: 2015-06-23 11:15:40
 author: Steven Lavoie
 tags:
 - tutorial
-- crackme
+- crackmes
 - reversing
 - project_bratalarm
 ---
@@ -14,7 +14,7 @@ tags:
 
 Notice there's another loop, so we're not done messing with the Name field. Rather than sit and watch this, set a breakpoint at the DIV instruction, three lines past the end of the loop and let it run.
 
-{% highlight nasm %}
+{% highlight nasm  %}
 mov     dl, byte ptr ds:[esi]          ; loop start
 xor     eax, edx                       ; loop body #1
 rol     eax, 5                         ; loop body #1

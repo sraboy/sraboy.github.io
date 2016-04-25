@@ -5,7 +5,7 @@ date: 2015-08-13 06:49:52
 author: Steven Lavoie
 tags:
 - tutorial
-- crackme
+- crackmes
 - reversing
 - project_bratalarm
 ---
@@ -14,11 +14,11 @@ tags:
 
 Sorry this update took so long. This update is also a bit longer and has a little less guidance as it will simply require you to make use of some of the previous lessons to build your C code.
 
-Let's get to work on the rest of the key generation algorithm. First off, remember we have to call **subChangeQWORD()** four times and skip every 9th letter. The disassembly at 0x40111A shows this happening but it's inlined instead of looped. The programmer wrote this in straight assembly but this may have been written as a loop that was unwrapped by the assembler to improve performance at the cost of a larger binary. 
+Let's get to work on the rest of the key generation algorithm. First off, remember we have to call **subChangeQWORD()** four times and skip every 9th letter. The disassembly at 0x40111A shows this happening but it's inlined instead of looped. The programmer wrote this in straight assembly but this may have been written as a loop that was unwrapped by the assembler to improve performance at the cost of a larger binary.
 
 Anywho, here's our new **main()** that will operate on the full 35-character serial instead of just the one segment we did previously:
 {% highlight c %}
-int main(void) 
+int main(void)
 {
     const int iterations = 4;
     char serial[35] = "serialnumbergoesherenowandstuffyay!";
@@ -37,12 +37,14 @@ int main(void)
         offset += 9;
         subChangeQWORD((char *)substring);
     }
-    
+
     return 0;
 }
 {% endhighlight %}
 
-Well, that was quite a diversion. Back in [Part I]({% post_url 2015-06-22-bratalarm_crackme_part_i %} we'd started with the code just before this, labeled *GetTextBoxSerial*.
+Well, that was quite a diversion. Back in [Part I]({% post_url 2015-06-22-bratalarm_crackme_part_i %}) we'd started with the code just before this, labeled *GetTextBoxSerial*.
+
+<!--more-->
 
 ![loops](/assets/posts/crackme_bratalarm/bratalarm_loops_ii.png)
 
@@ -50,15 +52,13 @@ We renamed a value to **NameSum** and then just moved on to see what was going o
 
 I'm not always consistent on this (and I really should be) but I will often use Hungarian notation for renaming variables in disassembly; it's just easier to keep track of things. So, NameSum -> szUsernameSummed and dword_40307C -> szUsernameMultiplied. (We're not renaming "String" here because, if you look further down in the code, you'll see that the same memory location is re-used for the serial number; it's just a placeholder for parameters.)
 
-<!--more-->
-
 So here's where IDA's graph view can sometimes be deceiving. Take a look at the first several lines in the location we've labeled **GetTextBoxSerial**. After more operations on register values that are still related to the username, EAX and EDX are saved off to memory. At first glance, it would have been easy to just gloss over this, assuming it's part of the serial number operations.
 
-Let's rename those variables as well, to ensure we know it's still operating on the username: dword_403080->szUsernameDivided and dword_403084->szUsernameANDed. Also, be aware that szUsernameDivided was modified based on the ROL'd value of EAX in the previous loop: **div ecx** divides ECX by the value in EAX and stores the value in EDX, which is then saved off to the memory location we just renamed. 
+Let's rename those variables as well, to ensure we know it's still operating on the username: dword_403080->szUsernameDivided and dword_403084->szUsernameANDed. Also, be aware that szUsernameDivided was modified based on the ROL'd value of EAX in the previous loop: **div ecx** divides ECX by the value in EAX and stores the value in EDX, which is then saved off to the memory location we just renamed.
 
 Okay, pause for a second. Have you noticed anything about the values derived from our username and serial? Each of them leads to four distinct values saved off into memory. We've just renamed the values resulting from the username alterations. Take a look at GetTextBoxSerial and notice that after each call to subChangeQWORD, the result is saved. Time to rename a few more things: I just use **szSerialNum_alt[x]** where [x] is consecutive 1-4 *(alt as in altered)*.
 
-As is often seen in software serials, the serial is probably derived from the username so we can expect to see each string's four values involved in a mathematical operation with the other string's values. Looking a bit further down, at 0x40116B, you'll notice several calls to some other functions we haven't looked at yet. There are also several **JNZ** instructions based on the checking of some register's value. Look a bit below those jumps to see the call to **MessageBoxA** for a correct serial. If we were simply interested in *cracking* this, we could just change those **JNZ** instructions to NOPs and *every* username/serial combo would work. 
+As is often seen in software serials, the serial is probably derived from the username so we can expect to see each string's four values involved in a mathematical operation with the other string's values. Looking a bit further down, at 0x40116B, you'll notice several calls to some other functions we haven't looked at yet. There are also several **JNZ** instructions based on the checking of some register's value. Look a bit below those jumps to see the call to **MessageBoxA** for a correct serial. If we were simply interested in *cracking* this, we could just change those **JNZ** instructions to NOPs and *every* username/serial combo would work.
 
 Our goal, however, is to write a keygen. Let's take a look at **sub_4011F1**:
 
@@ -147,7 +147,7 @@ for(i = 0; i < iterations; i++)
             szSerialNum_alt4 = subChangeQWORD((char *)substring);
             break;
     }
-    
+
 }
 {% endhighlight %}
 
@@ -199,7 +199,7 @@ void sub_401269(int a, int b, int c, int d, int * results);
 
 unsigned int szSerialNum_alt1, szSerialNum_alt2, szSerialNum_alt3, szSerialNum_alt4;
 
-int main(void) 
+int main(void)
 {
     /*
     int * results = malloc(sizeof(int)*2);
@@ -207,12 +207,12 @@ int main(void)
     printf("results[1] is %d\nresults[2] is %d\n", results[1], results[2]);
     return 0;
     */
-    
+
     unsigned int szSerialNum_alt1;
     unsigned int szSerialNum_alt2;
     unsigned int szSerialNum_alt3;
     unsigned int szSerialNum_alt4;
-    
+
     const int iterations = 4;
     char serial[] = "serialnumbergoesherenowandstuffyay!";
     char substring[9];
@@ -243,7 +243,7 @@ int main(void)
                 szSerialNum_alt4 = subChangeQWORD((char *)substring);
                 break;
         }
-        
+
     }
 
     return 0;
@@ -278,7 +278,7 @@ void sub_40128A(int a, int b, int c, int d, int * results)
 }
 
 unsigned int subChangeQWORD(char * stringQWORD)
-{    
+{
     const int strlen = 8;       //[0x4012CD] mov ecx, 8
     const int dlSub = 48;       //[0x4012DB] sub dl, 0x30
     const int dlCmp = 10;       //[0x4012DE] cmp dl, 0x0A
@@ -304,14 +304,14 @@ unsigned int subChangeQWORD(char * stringQWORD)
 
         dl -= dlCmpMaybe;        //[0x4012E3] sub dl, 0x7
         printf("dl - 7: %c\t", dl);
-        
-        printf("eax: 0x%08x\t\t", eax);        
-        
+
+        printf("eax: 0x%08x\t\t", eax);
+
         eax = eax << eaxSHL;     //[0x4012E6] shl eax, 0x4
         printf("eax << 4: 0x%08x\t", eax);
-        
+
         eax |= dl;               //[0x4012E9] or eax, edx
-        
+
         printf("eax |= dl: 0x%08x\n", eax);
         printf("---------------------------------------------------------------------------------------------------------------\n");
     }
@@ -358,7 +358,7 @@ void GetNameValues(char * name, int * results)
     nameMul *= 3;
 
     unsigned int nameShift = 0x12345678;
-    
+
     for(int c = 0; c <= len; c++)
     {
         //printf("nameShift: 0x%x\n", nameShift);
@@ -383,7 +383,7 @@ void GetNameValues(char * name, int * results)
     nameShift %= (unsigned int)0x7a69;
     quo /= (unsigned int)0x7a69;
     int nameAnd = quo & 0x0FFF;
-    
+
     results[0] = nameSum;
     results[1] = nameMul;
     results[2] = nameShift;
@@ -410,7 +410,7 @@ void GetNameValues(char * name, int * results);
 void sub_40128A(unsigned int a, unsigned int b, unsigned int c, unsigned int d, unsigned int * results);
 void sub_401269(unsigned int a, unsigned int b, unsigned int c, unsigned int d, unsigned int * results);
 
-int main(void) 
+int main(void)
 {
     char username[] = "username";
     unsigned int * NamesValues;
@@ -422,7 +422,7 @@ int main(void)
     AddValues = malloc(2 * sizeof(int));
     MultValues = malloc(2 * sizeof(int));
     Serial = malloc(4 * sizeof(int));
-    
+
     GetNameValues(username, NamesValues);
     sub_401269(NamesValues[0], NamesValues[1], NamesValues[2], NamesValues[3], AddValues);
     sub_40128A(NamesValues[0], NamesValues[1], NamesValues[2], NamesValues[3], MultValues);
@@ -431,7 +431,7 @@ int main(void)
     Serial[1] = AddValues[1];
     Serial[2] = MultValues[0];
     Serial[3] = MultValues[1];
-    
+
     printf("%08x-%08x-%08x-%08x\n\n", Serial[0], Serial[1], Serial[2], Serial[3]);
 
     return 0;
@@ -473,7 +473,7 @@ void GetNameValues(char * name, int * results)
     nameMul *= 3;
 
     unsigned int nameShift = 0x12345678;
-    
+
     for(int c = 0; c <= len; c++)
     {
         //printf("nameShift: 0x%x\n", nameShift);
@@ -498,7 +498,7 @@ void GetNameValues(char * name, int * results)
     nameShift %= (unsigned int)0x7a69;
     quo /= (unsigned int)0x7a69;
     int nameAnd = quo & 0x0FFF;
-    
+
     results[0] = nameSum;
     results[1] = nameMul;
     results[2] = nameShift;

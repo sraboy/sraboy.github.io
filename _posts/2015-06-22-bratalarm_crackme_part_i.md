@@ -5,10 +5,12 @@ date: 2015-06-22 22:44:45
 author: Steven Lavoie
 tags:
 - tutorial
-- crackme
+- crackmes
 - reversing
 - project_bratalarm
 ---
+
+Let's reverse something!
 
 We're going to go over a crackme from [CrackMes.de](http://crackmes.de). I'm going to assume you have a bit of background in x86 Assembly and some other high-level language with C-like syntax (C, C++, Javascript, Java). You should also have at least played around with a debugger, like [OllyDbg](http://www.ollydbg.de/), and a disassembler, like [IDA Pro](https://www.hex-rays.com/products/ida/support/download_freeware.shtml).
 
@@ -58,7 +60,7 @@ This is what you should see. If you were to scroll to the top of the graph, you'
 
 2. That line is coming out of the small box above and going back up to the box labeled "loc_40116B". IDA noted that this block of code is referenced in a loop so it broke it out separately for us. Now, thinking logically about a license key or password, a loop is how you'd iterate through every character to encode, decode or run it through whatever formula. That's not the case here though (explained in #4). At the very bottom of this block you can see there's a JNZ instruction. See #3.
 
-3. I've renamed* mine because if you follow the green arrow (green meaning the code executed if the jump is taken) you'll notice the several PUSH statements before the CALL to MessageBoxA. All this is doing is pushing function parameters on the stack and displaying a Windows Message Box dialog. IDA annotated what those strings contain so we can see this is the dialog that pops up when you get a wrong answer. 
+3. I've renamed* mine because if you follow the green arrow (green meaning the code executed if the jump is taken) you'll notice the several PUSH statements before the CALL to MessageBoxA. All this is doing is pushing function parameters on the stack and displaying a Windows Message Box dialog. IDA annotated what those strings contain so we can see this is the dialog that pops up when you get a wrong answer.
 
 *To rename it, select the "loc_######" and tap 'n'. In the dialog that pops up, call it whatever you like. Since it's not a function, it won't show up in IDA's Functions window. However, you can check the "Include in Names list" box to see it in that listing. You can see the Names by turning on that view in View>>Open Subviews>>Names. I prefer to do this but it can get unwieldy in a larger program to label random loops.
 
@@ -70,14 +72,14 @@ Let's see where that arrow began. This next image is just up higher. That other 
 
 2. This block is interesting. Notice that it calls GetDlgItemTextA. It just sounds like the kind of function that would retrieve input from a control on a dialog box. To verify, Google it and/or [check it out on MSDN](https://msdn.microsoft.com/en-us/library/windows/desktop/ms645489%28v=vs.85%29.aspx) (the 'A' at the end just means this is the ASCII version of the function; a 'w' would mean UNICODE). MSDN also tells us what parameters are being used and in what order. We know this program is using the [stdcall calling convention](https://en.wikipedia.org/wiki/X86_calling_conventions#stdcall) because if we scroll to the top of the graph, it says it: "; INT_ PTR __stdcall DialogFunc(...". You can also just see that IDA's annotated the parameter names for us and they're in reverse order of the function declaration on MSDN.
 
-| Parameter | Value | Notes | 
+| Parameter | Value | Notes |
 | --- | --- | --- |
 | hDlg |  | We don't care about this. |
 | nldDDlgItem | 0x3ea | Points to the control for which we want the value. |
 | lpString |  | A pointer for the function to store the value in. |
 | cchMax | 0x100 (256d) | Whatever this value is, it's capped at 256 characters max. |
 
-Is this the Name or Serial? Click on GetDlgItemTextA to highlight it and see if it's called elsewhere. Well -- wouldn't you know it? -- it's right there in that bottom block. 
+Is this the Name or Serial? Click on GetDlgItemTextA to highlight it and see if it's called elsewhere. Well -- wouldn't you know it? -- it's right there in that bottom block.
 
 
 3. Look at the condition for the jump after the function call:
@@ -123,13 +125,13 @@ mov   dword ptr ds:[Crackme.403078], eax   ;loop results utilization
 
 - Next up is incrementing ESI. We know it starts at the first character, the 'u' in "username" in the image here. This literally just adds 1 to the value in ESI, which is the memory address of the string's first byte.
 
-- Next is TESTing EDX against itself. All the the [TEST instruction](http://x86.renejeschke.de/html/file_module_x86_id_315.html) does is AND EDX against itself and set EFLAGS based on the result. The result is that if EDX is zero, then ZF (Zero Flag) is true. If EDX isn't zero, then ZF is false. 
+- Next is TESTing EDX against itself. All the the [TEST instruction](http://x86.renejeschke.de/html/file_module_x86_id_315.html) does is AND EDX against itself and set EFLAGS based on the result. The result is that if EDX is zero, then ZF (Zero Flag) is true. If EDX isn't zero, then ZF is false.
 
 - ZF will remain false as long as there's a character in EDX, which is until we hit the null terminator in the string. So the JNZ (Jump if Not Zero) will always jump until we hit the end of the string.
 
 - In English, this means our loop is cumulatively adding up the characters' values in EAX. To skip through this all, remove the breakpoint and place another after the JNZ and hit run.
 
-When it breaks, look at the value of EAX. For "username", it's 0x360. The very next line stores this in a memory location. Go back to this line in IDA and name that memory location (dword_403078) something useful, like "NameSum". 
+When it breaks, look at the value of EAX. For "username", it's 0x360. The very next line stores this in a memory location. Go back to this line in IDA and name that memory location (dword_403078) something useful, like "NameSum".
 
 Let's move on a bit.
 
