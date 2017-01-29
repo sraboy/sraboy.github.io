@@ -12,6 +12,8 @@ tags:
 
 *Continued from [Part III]({% post_url 2015-06-24-bratalarm_crackme_part_iii %}), [Part II]({% post_url 2015-06-23-bratalarm_crackme_part_ii %}) and [Part I]({% post_url 2015-06-22-bratalarm_crackme_part_i %}).*
 
+---
+
 Sorry this update took so long. This update is also a bit longer and has a little less guidance as it will simply require you to make use of some of the previous lessons to build your C code.
 
 Let's get to work on the rest of the key generation algorithm. First off, remember we have to call **subChangeQWORD()** four times and skip every 9th letter. The disassembly at 0x40111A shows this happening but it's inlined instead of looped. The programmer wrote this in straight assembly but this may have been written as a loop that was unwrapped by the assembler to improve performance at the cost of a larger binary.
